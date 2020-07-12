@@ -1,0 +1,11 @@
+{
+	"compilerOptions": {
+		"noImplicitAny": false,
+		"allowJs": true,
+		"checkJs": true,
+		"outDir": "./bin/",
+		"module": "ESNext",
+		"downlevelIteration": true,
+		"target": "ESNext"
+	}
+}

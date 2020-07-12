@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Factory</title>
+		<style>
+			body {
+				margin: 0;
+				overflow: hidden;
+			}
+			.fullFixed {
+				position: fixed;
+				top: 0;
+				left: 0;
+				width: 100vw;
+				height: 100vh;
+			}
+			.fixed {
+				position: fixed;
+			}
+			.panel {
+				border: 3px solid #00ffff;
+				background: #00ffff80;
+				color: white;
+				padding: 0.5cm;
+				pointer-events: all;
+			}
+			input {
+				border: none;
+				border-bottom: 2px solid green;
+				color: white;
+				background: none;
+				padding: 0;
+			}
+			.err {
+				border-bottom: 2px solid red;
+			}
+			button {
+				border: none;
+				border-bottom: 2px solid green;
+				color: white;
+				background: none;
+				padding: 0;
+				margin: 5px;
+			}
+		</style>
+	</head>
+	<body>
+		<script src="../Simulator/global.js"></script>
+		<script type="module" src="./game.js"></script>
+	</body>
+</html>
