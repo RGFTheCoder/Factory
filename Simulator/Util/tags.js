@@ -32,7 +32,7 @@ export function compareTags(allTags, requestedTags) {
 
 /**
  * Returns a boolean on whether or not an item has a tag
- * @param {Item} item
+ * @param {{tags:string[]}} item
  * @param {string} tag
  */
 export function hasTag(item, tag) {

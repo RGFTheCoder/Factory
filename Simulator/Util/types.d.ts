@@ -5,8 +5,10 @@ import { Base } from '../Machine/Base/Base.js';
 type Class<T> = new () => T;
 type Recipe = {
 	type: string;
-	input: any;
-	output: any;
+	name: string;
+	work: number;
+	input: string[];
+	output: Class<Item>[];
 };
 
 type globalConf = {
@@ -20,6 +22,10 @@ type globalConf = {
 	platform: 'node' | 'web';
 	globalData: { [key: string]: any };
 	recipes: Recipe[];
+	modList: string[];
+	funcs: {
+		reloadMods(): void;
+	};
 };
 declare namespace NodeJS {
 	interface Global {

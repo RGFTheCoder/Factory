@@ -1,15 +1,15 @@
-import { Machine } from '../Machine/Machine.js';
+import { Base } from '../Machine/Base/Base.js';
 import { MagicGrid } from '../Util/MagicGrid.js';
 
 export class Factory {
 	/**
-	 * @type {MagicGrid<Machine>}
+	 * @type {MagicGrid<Base>}
 	 */
 	world = new MagicGrid();
 	_loop = 0;
 
 	constructor() {
-		this.gameLoop();
+		// this.gameLoop();
 	}
 
 	gameLoop() {
@@ -28,14 +28,14 @@ export class Factory {
 
 	/**
 	 * Get location of a machine
-	 * @param {Machine} machine
+	 * @param {Base} machine
 	 */
 	find(machine) {
 		return this.world.whereIs(machine);
 	}
 	/**
 	 * Add a machine at specified coordinates
-	 * @param {Machine} machine
+	 * @param {Base} machine
 	 * @param {number} x
 	 * @param {number} y
 	 */
@@ -54,16 +54,16 @@ export class Factory {
 	/**
 	 * Runs the entire world loop on round-robin
 	 */
-	loop() {
+	async loop() {
 		for (const item of this.world.itemList) {
-			(async () => item.loop())();
+			item.loop();
 		}
 		if (this.world.itemList.length > 1)
 			this.world.itemList.push(this.world.itemList.shift());
 	}
 	/**
 	 * Gets a machine relative to another
-	 * @param {Machine} machine
+	 * @param {Base} machine
 	 * @param {number} x
 	 * @param {number} y
 	 */

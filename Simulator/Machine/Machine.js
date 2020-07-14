@@ -1,7 +1,4 @@
-import { Item } from '../Item/Item.js';
-import { deviate } from '../Util/random.js';
-import { Factory } from '../Factory/Factory.js';
-import { Base } from './Base/Base.js';
+import { Base } from '../Machine/Base/Base.js';
 
 const currentURL = import.meta.url.split('/');
 const currentFolder =
@@ -23,7 +20,7 @@ export class Machine extends Base {
 	draw(ctx, sprites) {
 		try {
 			ctx.drawImage(
-				sprites[location.origin + '/Simulator/Machine/MiscAssets/Machine.svg'],
+				sprites[location.origin + '/Simulator/MiscAssets/Machine.svg'],
 				0,
 				0,
 				1,
@@ -63,5 +60,5 @@ export class Machine extends Base {
 	/**
 	 * Function that is called many times per second
 	 */
-	loop() {}
+	async loop() {}
 }

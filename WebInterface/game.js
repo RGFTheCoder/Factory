@@ -1,21 +1,24 @@
 /// <reference path="../Simulator/Util/types.d.ts" />
 /// <reference path="./types.d.ts" />
+import '../Simulator/global.js';
 
 import { Factory } from '../Simulator/Factory/Factory.js';
-import '../Simulator/global.js';
 import { Item } from '../Simulator/Item/Item.js';
-import '../Simulator/Item/Minerals/Coal/Coal.js';
-import '../Simulator/Machine/Atomizer/Atomizer.js';
-import '../Simulator/Machine/Conveyor/Conveyor.js';
-import '../Simulator/Machine/Dev/Sink/Sink.js';
-import '../Simulator/Machine/Source/Source.js';
-import '../Simulator/Machine/Storage/InputMover/InputMover.js';
-import '../Simulator/Machine/Storage/OmniMover/OmniMover.js';
-import '../Simulator/Machine/Storage/OutputMover/OutputMover.js';
-import '../Simulator/Machine/Storage/Storage.js';
+// import('../Simulator/Item/Minerals/Coal/Coal.js');
+// import('../Simulator/Machine/Atomizer/Atomizer.js');
+// import('../Simulator/Machine/Movement/Conveyor/Conveyor.js');
+// import('../Simulator/Machine/Movement/Extractor/Extractor.js');
+// import('../Simulator/Machine/Movement/Extractor/Mine/Mine.js');
+// import('../Simulator/Machine/Dev/Sink/Sink.js');
+// import('../Simulator/Machine/Source/Source.js');
+// import('../Simulator/Machine/Storage/InputMover/InputMover.js');
+// import('../Simulator/Machine/Storage/OmniMover/OmniMover.js');
+// import('../Simulator/Machine/Storage/OutputMover/OutputMover.js');
+// import('../Simulator/Machine/Storage/Storage.js');
 import { sprites } from './SpriteGen.js';
 import { del } from '../Simulator/Util/del.js';
 import { Base } from '../Simulator/Machine/Base/Base.js';
+// import { Base } from '../Simulator/Machine/Base/Base.js';
 
 const factory = new Factory();
 // {
@@ -64,6 +67,8 @@ function getSpriteUrl(item) {
 }
 
 game.factory = factory;
+
+factory.gameLoop();
 
 window.sprites = sprites;
 
@@ -283,7 +288,7 @@ let currentMode = 'edit';
 
 	const newButton = document.createElement('button');
 	const newButtonImage = document.createElement('img');
-	newButtonImage.src = '/Simulator/Machine/MiscAssets/New.svg';
+	newButtonImage.src = '/Simulator/MiscAssets/New.svg';
 	newButton.appendChild(newButtonImage);
 	newButton.addEventListener('click', () => {
 		currentMode = 'new';
@@ -292,7 +297,7 @@ let currentMode = 'edit';
 	ToolPanel.appendChild(newButton);
 	const editButton = document.createElement('button');
 	const editButtonImage = document.createElement('img');
-	editButtonImage.src = '/Simulator/Machine/MiscAssets/Edit.svg';
+	editButtonImage.src = '/Simulator/MiscAssets/Edit.svg';
 	editButton.appendChild(editButtonImage);
 	editButton.addEventListener('click', () => {
 		currentMode = 'edit';
@@ -301,7 +306,7 @@ let currentMode = 'edit';
 	ToolPanel.appendChild(editButton);
 	const deleteButton = document.createElement('button');
 	const deleteButtonImage = document.createElement('img');
-	deleteButtonImage.src = '/Simulator/Machine/MiscAssets/Delete.svg';
+	deleteButtonImage.src = '/Simulator/MiscAssets/Delete.svg';
 	deleteButton.appendChild(deleteButtonImage);
 	deleteButton.addEventListener('click', () => {
 		currentMode = 'delete';
@@ -333,109 +338,108 @@ let currentMode = 'edit';
 	const params = document.createElement('div');
 	MachineList.appendChild(params);
 
-	for (let id in game.machines) {
-		const button = document.createElement('button');
-		button.textContent = id;
-		button.addEventListener('click', () => {
-			selected = game.machines[id];
-			defProps = {};
-			looked.delete();
-			// @ts-ignore
-			looked = new selected();
-			while (params.children.length > 0) params.removeChild(params.firstChild);
-			for (let id in looked.editableProps) {
-				const data = looked.editableProps[id];
-				const item = document.createElement('span');
-				const inpu = document.createElement('input');
-				const linebreak = document.createElement('br');
-				item.append(document.createTextNode(id + ': '));
-				switch (data) {
-					case 'item': {
-						const tempItem = new looked[id]();
-						item.append(document.createTextNode('['));
-						item.appendChild(inpu);
-						item.append(document.createTextNode(']'));
-
-						inpu.value = tempItem.name;
-
-						del(tempItem);
-						inpu.addEventListener('keypress', (ev) => {
-							const text =
-								ev.key == 'Backspace'
-									? inpu.value.substr(0, inpu.value.length - 1)
-									: inpu.value + ev.key;
-							if (text in game.items) {
-								inpu.classList.remove('err');
-								looked[id] = game.items[text];
-								defProps[id] = game.items[text];
-							} else {
-								inpu.classList.add('err');
-							}
-						});
-						break;
-					}
-					case 'machine': {
-						//TODO
-						break;
-					}
-					case 'number': {
-						item.appendChild(inpu);
-						inpu.value = looked[id];
-						inpu.addEventListener('keypress', (ev) => {
-							if (isFinite(Number(inpu.value))) {
-								inpu.classList.remove('err');
-								looked[id] = Number(inpu.value);
-								defProps[id] = Number(inpu.value);
-							} else {
-								inpu.classList.add('err');
-							}
-						});
-						break;
-					}
-					case 'string': {
-						item.append(document.createTextNode("'"));
-						item.appendChild(inpu);
-						item.append(document.createTextNode("'"));
-						inpu.addEventListener('keypress', (ev) => {
-							console.log(ev.key);
-							looked[id] = inpu.value;
-							defProps[id] = inpu.value;
-						});
-						inpu.value = looked[id];
-
-						break;
-					}
-					default: {
-						item.append(document.createTextNode('/'));
-						item.appendChild(inpu);
-						item.append(document.createTextNode('/'));
-						inpu.value = looked[id];
-
-						inpu.addEventListener('keydown', (ev) => {
-							const text =
-								ev.key == 'Backspace'
-									? inpu.value.substr(0, inpu.value.length - 1)
-									: inpu.value + ev.key;
-							if (data.test(text)) {
-								inpu.classList.remove('err');
-								looked[id] = inpu.value + ev.key;
-								defProps[id] = inpu.value + ev.key;
-							} else {
-								inpu.classList.add('err');
-							}
-						});
-					}
-				}
-				item.appendChild(linebreak);
-				params.appendChild(item);
-			}
-		});
-		gallery.appendChild(button);
-	}
-
 	UI.appendChild(MachineList);
 
 	UIUpdates.push((type) => {
+		if (currentMode == 'new' && MachineList.hidden == true) {
+			while (gallery.children.length > 0)
+				gallery.removeChild(gallery.firstChild);
+			for (let id in game.machines) {
+				const button = document.createElement('button');
+				button.textContent = id;
+				button.addEventListener('click', () => {
+					selected = game.machines[id];
+					defProps = {};
+					looked.delete();
+					// @ts-ignore
+					looked = new selected();
+					while (params.children.length > 0)
+						params.removeChild(params.firstChild);
+					for (let id in looked.editableProps) {
+						const data = looked.editableProps[id];
+						const item = document.createElement('span');
+						const inpu = document.createElement('input');
+						const linebreak = document.createElement('br');
+						item.append(document.createTextNode(id + ': '));
+						switch (data) {
+							case 'item': {
+								const tempItem = new looked[id]();
+								item.append(document.createTextNode('['));
+								item.appendChild(inpu);
+								item.append(document.createTextNode(']'));
+
+								inpu.value = tempItem.name;
+
+								del(tempItem);
+								inpu.addEventListener('keyup', (ev) => {
+									const text = inpu.value;
+									if (text in game.items) {
+										inpu.classList.remove('err');
+										looked[id] = game.items[text];
+										defProps[id] = game.items[text];
+									} else {
+										inpu.classList.add('err');
+									}
+								});
+								break;
+							}
+							case 'machine': {
+								//TODO
+								break;
+							}
+							case 'number': {
+								item.appendChild(inpu);
+								inpu.value = looked[id];
+								inpu.addEventListener('keyup', (ev) => {
+									if (isFinite(Number(inpu.value))) {
+										inpu.classList.remove('err');
+										looked[id] = Number(inpu.value);
+										defProps[id] = Number(inpu.value);
+									} else {
+										inpu.classList.add('err');
+									}
+								});
+								break;
+							}
+							case 'string': {
+								item.append(document.createTextNode("'"));
+								item.appendChild(inpu);
+								item.append(document.createTextNode("'"));
+								inpu.addEventListener('keyup', (ev) => {
+									console.log(ev.key);
+									looked[id] = inpu.value;
+									defProps[id] = inpu.value;
+								});
+								inpu.value = looked[id];
+
+								break;
+							}
+							default: {
+								item.append(document.createTextNode('/'));
+								item.appendChild(inpu);
+								item.append(document.createTextNode('/'));
+								inpu.value = looked[id];
+
+								inpu.addEventListener('keyup', (ev) => {
+									const text = inpu.value;
+									if (data.test(text)) {
+										inpu.classList.remove('err');
+										looked[id] = inpu.value + ev.key;
+										defProps[id] = inpu.value + ev.key;
+									} else {
+										inpu.classList.add('err');
+									}
+								});
+							}
+						}
+						item.appendChild(linebreak);
+						params.appendChild(item);
+					}
+				});
+				gallery.appendChild(button);
+			}
+		}
+
 		if (currentMode != 'new') MachineList.hidden = true;
 		else MachineList.hidden = false;
 		if ((type == 'click' || type == 'drag') && currentMode == 'new') {
@@ -500,11 +504,8 @@ let currentMode = 'edit';
 						inpu.value = tempItem.name;
 
 						del(tempItem);
-						inpu.addEventListener('keypress', (ev) => {
-							const text =
-								ev.key == 'Backspace'
-									? inpu.value.substr(0, inpu.value.length - 1)
-									: inpu.value + ev.key;
+						inpu.addEventListener('keyup', (ev) => {
+							const text = inpu.value;
 							if (text in game.items) {
 								inpu.classList.remove('err');
 								looked[id] = game.items[text];
@@ -521,7 +522,7 @@ let currentMode = 'edit';
 					case 'number': {
 						item.appendChild(inpu);
 						inpu.value = looked[id];
-						inpu.addEventListener('keypress', (ev) => {
+						inpu.addEventListener('keyup', (ev) => {
 							if (isFinite(Number(inpu.value))) {
 								inpu.classList.remove('err');
 								looked[id] = Number(inpu.value);
@@ -535,7 +536,7 @@ let currentMode = 'edit';
 						item.append(document.createTextNode("'"));
 						item.appendChild(inpu);
 						item.append(document.createTextNode("'"));
-						inpu.addEventListener('keypress', (ev) => {
+						inpu.addEventListener('keyup', (ev) => {
 							console.log(ev.key);
 							looked[id] = inpu.value;
 						});
@@ -549,11 +550,8 @@ let currentMode = 'edit';
 						item.append(document.createTextNode('/'));
 						inpu.value = looked[id];
 
-						inpu.addEventListener('keydown', (ev) => {
-							const text =
-								ev.key == 'Backspace'
-									? inpu.value.substr(0, inpu.value.length - 1)
-									: inpu.value + ev.key;
+						inpu.addEventListener('keyup', (ev) => {
+							const text = inpu.value;
 							if (data.test(text)) {
 								inpu.classList.remove('err');
 								looked[id] = inpu.value + ev.key;

@@ -2,6 +2,20 @@
 const DEV = true;
 
 /**
+ * @type {{
+ * 	world: Object[];
+ * 	modList: string[];
+ * }}
+ */
+const data = JSON.parse(
+	localStorage.factoryData ||
+		JSON.stringify({
+			world: [],
+			modList: [],
+		})
+);
+
+/**
  * @type {import("./Util/types").globalConf}
  */
 globalThis.game = {
@@ -13,10 +27,18 @@ globalThis.game = {
 	platform: typeof window === 'undefined' ? 'node' : 'web',
 	globalData: {},
 	recipes: [],
+	modList: data.modList,
+	funcs: { reloadMods },
 };
 
-import('./Recipes/all.js').then((x) => {
-	for (let rec in x) {
-		game.recipes.push(x[rec]);
+reloadMods();
+
+async function reloadMods() {
+	for (const mod of game.modList) {
+		await import(`./Packs/${mod}/pack.js`);
 	}
+}
+
+addEventListener('unload', () => {
+	localStorage.factoryData = JSON.stringify(data);
 });

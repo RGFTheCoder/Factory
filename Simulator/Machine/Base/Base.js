@@ -6,6 +6,8 @@ const currentFolder =
 	currentURL.slice(0, currentURL.length - 1).join('/') + '/';
 
 export class Base {
+	/** @type {string[]} */
+	tags = [];
 	/** @type {{[key:string]:RegExp|'number'|'string'|'item'|'machine'}} */
 	editableProps = {
 		rotation: /^(0|90|180|270)$/,
@@ -118,7 +120,7 @@ export class Base {
 	/**
 	 * Function that is called many times per second
 	 */
-	loop() {}
+	async loop() {}
 
 	/**
 	 * Adds an item to this machine
