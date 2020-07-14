@@ -14,7 +14,7 @@ game.globalData.Storage = game.globalData.Storage ?? {
 
 export class OmniMover extends Machine {
 	prettyName = 'OmniMover';
-	/** @type {{[key:string]:RegExp|'number'|'string'|'item'|'machine'}} */
+	/** @type {{[key:string]:import('../../../../../Util/types.js').ViewableTypes}} */
 	editableProps = {};
 
 	tags = fixTags(['machine.omnimover', 'capability.extract']);

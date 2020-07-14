@@ -18,6 +18,7 @@ import { Item } from '../Simulator/Item/Item.js';
 import { sprites } from './SpriteGen.js';
 import { del } from '../Simulator/Util/del.js';
 import { Base } from '../Simulator/Machine/Base/Base.js';
+import { hasTag } from '../Simulator/Util/tags.js';
 // import { Base } from '../Simulator/Machine/Base/Base.js';
 
 const factory = new Factory();
@@ -68,9 +69,11 @@ function getSpriteUrl(item) {
 
 game.factory = factory;
 
-game.funcs.reloadMods().then(() => game.funcs.loadFactory());
+game.funcs
+	.reloadMods()
+	.then(() => !game.urlParams.get('noLoad') && factory.deserialize(game.world));
 
-factory.gameLoop();
+if (!game.urlParams.get('noLoop')) factory.gameLoop();
 
 window.sprites = sprites;
 
@@ -344,97 +347,107 @@ let currentMode = 'edit';
 			while (gallery.children.length > 0)
 				gallery.removeChild(gallery.firstChild);
 			for (let id in game.machines) {
-				const button = document.createElement('button');
-				button.textContent = id;
-				button.addEventListener('click', () => {
-					selected = game.machines[id];
-					defProps = {};
-					looked.delete();
-					// @ts-ignore
-					looked = new selected();
-					while (params.children.length > 0)
-						params.removeChild(params.firstChild);
-					for (let id in looked.editableProps) {
-						const data = looked.editableProps[id];
-						const item = document.createElement('span');
-						const inpu = document.createElement('input');
-						const linebreak = document.createElement('br');
-						item.append(document.createTextNode(id + ': '));
-						switch (data) {
-							case 'item': {
-								const tempItem = new looked[id]();
-								item.append(document.createTextNode('['));
-								item.appendChild(inpu);
-								item.append(document.createTextNode(']'));
+				//@ts-ignore
+				const mach = new game.machines[id]();
+				const out = !hasTag(mach, 'system');
+				del(mach);
+				if (out || game.DEV) {
+					const button = document.createElement('button');
+					button.textContent = id;
+					button.addEventListener('click', () => {
+						selected = game.machines[id];
+						defProps = {};
+						looked.delete();
+						// @ts-ignore
+						looked = new selected();
+						while (params.children.length > 0)
+							params.removeChild(params.firstChild);
+						for (let id in looked.editableProps) {
+							const data = looked.editableProps[id];
+							let item = document.createElement('span');
+							const inpu = document.createElement('input');
+							const linebreak = document.createElement('br');
+							item.append(document.createTextNode(id + ': '));
+							switch (data) {
+								case 'item': {
+									const tempItem = new looked[id]();
+									item.append(document.createTextNode('['));
+									item.appendChild(inpu);
+									item.append(document.createTextNode(']'));
 
-								inpu.value = tempItem.name;
+									inpu.value = tempItem.name;
 
-								del(tempItem);
-								inpu.addEventListener('keyup', (ev) => {
-									const text = inpu.value;
-									if (text in game.items) {
-										inpu.classList.remove('err');
-										looked[id] = game.items[text];
-										defProps[id] = game.items[text];
-									} else {
-										inpu.classList.add('err');
-									}
-								});
-								break;
-							}
-							case 'machine': {
-								//TODO
-								break;
-							}
-							case 'number': {
-								item.appendChild(inpu);
-								inpu.value = looked[id];
-								inpu.addEventListener('keyup', (ev) => {
-									if (isFinite(Number(inpu.value))) {
-										inpu.classList.remove('err');
-										looked[id] = Number(inpu.value);
-										defProps[id] = Number(inpu.value);
-									} else {
-										inpu.classList.add('err');
-									}
-								});
-								break;
-							}
-							case 'string': {
-								item.append(document.createTextNode("'"));
-								item.appendChild(inpu);
-								item.append(document.createTextNode("'"));
-								inpu.addEventListener('keyup', (ev) => {
-									looked[id] = inpu.value;
-									defProps[id] = inpu.value;
-								});
-								inpu.value = looked[id];
-
-								break;
-							}
-							default: {
-								item.append(document.createTextNode('/'));
-								item.appendChild(inpu);
-								item.append(document.createTextNode('/'));
-								inpu.value = looked[id];
-
-								inpu.addEventListener('keyup', (ev) => {
-									const text = inpu.value;
-									if (data.test(text)) {
-										inpu.classList.remove('err');
+									del(tempItem);
+									inpu.addEventListener('keyup', (ev) => {
+										const text = inpu.value;
+										if (text in game.items) {
+											inpu.classList.remove('err');
+											looked[id] = game.items[text];
+											defProps[id] = game.items[text];
+										} else {
+											inpu.classList.add('err');
+										}
+									});
+									break;
+								}
+								case 'machine': {
+									//TODO
+									break;
+								}
+								case 'number': {
+									item.appendChild(inpu);
+									inpu.value = looked[id];
+									inpu.addEventListener('keyup', (ev) => {
+										if (isFinite(Number(inpu.value))) {
+											inpu.classList.remove('err');
+											looked[id] = Number(inpu.value);
+											defProps[id] = Number(inpu.value);
+										} else {
+											inpu.classList.add('err');
+										}
+									});
+									break;
+								}
+								case 'string': {
+									item.append(document.createTextNode("'"));
+									item.appendChild(inpu);
+									item.append(document.createTextNode("'"));
+									inpu.addEventListener('keyup', (ev) => {
 										looked[id] = inpu.value;
 										defProps[id] = inpu.value;
-									} else {
-										inpu.classList.add('err');
+									});
+									inpu.value = looked[id];
+
+									break;
+								}
+								case 'none':
+									break;
+								default: {
+									if (data instanceof RegExp) {
+										item.append(document.createTextNode('/'));
+										item.appendChild(inpu);
+										item.append(document.createTextNode('/'));
+										inpu.value = looked[id];
+
+										inpu.addEventListener('keyup', (ev) => {
+											const text = inpu.value;
+											if (data.test(text)) {
+												inpu.classList.remove('err');
+												looked[id] = inpu.value;
+												defProps[id] = inpu.value;
+											} else {
+												inpu.classList.add('err');
+											}
+										});
 									}
-								});
+								}
 							}
+							item.appendChild(linebreak);
+							params.appendChild(item);
 						}
-						item.appendChild(linebreak);
-						params.appendChild(item);
-					}
-				});
-				gallery.appendChild(button);
+					});
+					gallery.appendChild(button);
+				}
 			}
 		}
 
@@ -475,6 +488,8 @@ let currentMode = 'edit';
 	UI.appendChild(InfoPanel);
 
 	UIUpdates.push((type) => {
+		if (currentMode != 'edit') InfoPanel.hidden = true;
+
 		if (type == 'click') {
 			const looked = factory.at(mouse.x, mouse.y);
 			if (looked == null || currentMode != 'edit') {
@@ -487,80 +502,88 @@ let currentMode = 'edit';
 
 			while (params.children.length > 0) params.removeChild(params.firstChild);
 			for (let id in looked.editableProps) {
-				const data = looked.editableProps[id];
-				const item = document.createElement('span');
-				const inpu = document.createElement('input');
-				const linebreak = document.createElement('br');
-				item.append(document.createTextNode(id + ': '));
-				switch (data) {
-					case 'item': {
-						const tempItem = new looked[id]();
-						item.append(document.createTextNode('['));
-						item.appendChild(inpu);
-						item.append(document.createTextNode(']'));
+				if (!hasTag(looked, 'system') || game.DEV) {
+					const data = looked.editableProps[id];
+					let item = document.createElement('span');
+					const inpu = document.createElement('input');
+					const linebreak = document.createElement('br');
+					item.append(document.createTextNode(id + ': '));
+					switch (data) {
+						case 'item': {
+							const tempItem = new looked[id]();
+							item.append(document.createTextNode('['));
+							item.appendChild(inpu);
+							item.append(document.createTextNode(']'));
 
-						inpu.value = tempItem.name;
+							inpu.value = tempItem.name;
 
-						del(tempItem);
-						inpu.addEventListener('keyup', (ev) => {
-							const text = inpu.value;
-							if (text in game.items) {
-								inpu.classList.remove('err');
-								looked[id] = game.items[text];
-							} else {
-								inpu.classList.add('err');
-							}
-						});
-						break;
-					}
-					case 'machine': {
-						//TODO
-						break;
-					}
-					case 'number': {
-						item.appendChild(inpu);
-						inpu.value = looked[id];
-						inpu.addEventListener('keyup', (ev) => {
-							if (isFinite(Number(inpu.value))) {
-								inpu.classList.remove('err');
-								looked[id] = Number(inpu.value);
-							} else {
-								inpu.classList.add('err');
-							}
-						});
-						break;
-					}
-					case 'string': {
-						item.append(document.createTextNode("'"));
-						item.appendChild(inpu);
-						item.append(document.createTextNode("'"));
-						inpu.addEventListener('keyup', (ev) => {
-							console.log(ev.key);
-							looked[id] = inpu.value;
-						});
-						inpu.value = looked[id];
-
-						break;
-					}
-					default: {
-						item.append(document.createTextNode('/'));
-						item.appendChild(inpu);
-						item.append(document.createTextNode('/'));
-						inpu.value = looked[id];
-
-						inpu.addEventListener('keyup', (ev) => {
-							const text = inpu.value;
-							if (data.test(text)) {
-								inpu.classList.remove('err');
+							del(tempItem);
+							inpu.addEventListener('keyup', (ev) => {
+								const text = inpu.value;
+								if (text in game.items) {
+									inpu.classList.remove('err');
+									looked[id] = game.items[text];
+								} else {
+									inpu.classList.add('err');
+								}
+							});
+							break;
+						}
+						case 'machine': {
+							//TODO
+							break;
+						}
+						case 'number': {
+							item.appendChild(inpu);
+							inpu.value = looked[id];
+							inpu.addEventListener('keyup', (ev) => {
+								if (isFinite(Number(inpu.value))) {
+									inpu.classList.remove('err');
+									looked[id] = Number(inpu.value);
+								} else {
+									inpu.classList.add('err');
+								}
+							});
+							break;
+						}
+						case 'string': {
+							item.append(document.createTextNode("'"));
+							item.appendChild(inpu);
+							item.append(document.createTextNode("'"));
+							inpu.addEventListener('keyup', (ev) => {
 								looked[id] = inpu.value;
-							} else {
-								inpu.classList.add('err');
+							});
+							inpu.value = looked[id];
+
+							break;
+						}
+						case 'none':
+							break;
+						default: {
+							if (data instanceof RegExp) {
+								item.append(document.createTextNode('/'));
+								item.appendChild(inpu);
+								item.append(document.createTextNode('/'));
+								inpu.value = looked[id];
+
+								inpu.addEventListener('keyup', (ev) => {
+									const text = inpu.value;
+									if (data.test(text)) {
+										inpu.classList.remove('err');
+										looked[id] = inpu.value;
+									} else {
+										inpu.classList.add('err');
+									}
+								});
+							} else if (data instanceof Function) {
+								item = document.createElement('div');
+								data.apply(looked, [item]);
 							}
-						});
+						}
 					}
+					item.appendChild(linebreak);
+					params.appendChild(item);
 				}
-				item.appendChild(linebreak);
-				params.appendChild(item);
 			}
 			InfoPanel.hidden = false;
 		}

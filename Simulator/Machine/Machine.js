@@ -7,7 +7,7 @@ const currentFolder =
 export class Machine extends Base {
 	/** @type {string[]} */
 	tags = ['system'];
-	/** @type {{[key:string]:RegExp|'number'|'string'|'item'|'machine'}} */
+	/** @type {{[key:string]:import('../Util/types.js').ViewableTypes}} */
 	editableProps = {
 		rotation: /^(0|90|180|270)$/,
 	};

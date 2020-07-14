@@ -11,7 +11,17 @@ type Recipe = {
 	output: Class<Item>[];
 };
 
+type ViewableTypes =
+	| RegExp
+	| 'number'
+	| 'string'
+	| 'item'
+	| 'machine'
+	| 'none'
+	| ((elm: HTMLDivElement) => void);
+
 type globalConf = {
+	DEV: boolean;
 	tickSpeed: number;
 	tickSpeedVariance: number;
 	machines: {
@@ -25,10 +35,10 @@ type globalConf = {
 	modList: string[];
 	funcs: {
 		reloadMods(): Promise<void>;
-		deserializeItem(data: Object): Item;
-		deserializeMachine(data: Object, factory: Factory): Base;
-		loadFactory(): Promise<void>;
 	};
+	urlParams: URLSearchParams;
+	save: string;
+	world: Object;
 };
 declare namespace NodeJS {
 	interface Global {

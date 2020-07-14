@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   sodipodi:docname="MicroFactory.svg"
+   inkscape:version="1.0 (1.0+r73+1)"
+   width="32"
+   height="32"
+   viewBox="0 0 32 32"
+   version="1.1"
+   id="SVGRoot">
+  <defs
+     id="defs10" />
+  <sodipodi:namedview
+     scale-x="1"
+     inkscape:window-maximized="1"
+     inkscape:window-y="0"
+     inkscape:window-x="0"
+     inkscape:window-height="1044"
+     inkscape:window-width="1920"
+     showgrid="true"
+     inkscape:document-rotation="0"
+     inkscape:current-layer="layer1"
+     inkscape:document-units="px"
+     inkscape:cy="15.628026"
+     inkscape:cx="28.160048"
+     inkscape:zoom="21.221893"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     borderopacity="1.0"
+     bordercolor="#666666"
+     pagecolor="#ffffff"
+     id="base">
+    <inkscape:grid
+       empspacing="4"
+       spacingy="1"
+       spacingx="1"
+       type="xygrid"
+       id="grid19" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata13">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     id="layer1"
+     inkscape:groupmode="layer"
+     inkscape:label="Layer 1">
+    <g
+       id="g846">
+      <rect
+         style="fill:#808080;stroke-width:0"
+         id="rect833"
+         width="24"
+         height="24"
+         x="4"
+         y="4" />
+      <path
+         id="rect833-3"
+         style="fill:#cccccc;stroke-width:0"
+         d="M 0,0 4,4 V 28 L 0,32 Z"
+         sodipodi:nodetypes="ccccc" />
+      <path
+         sodipodi:nodetypes="ccccc"
+         d="M 32,0 28,4 H 4 L 0,0 Z"
+         style="fill:#ececec;stroke-width:0"
+         id="path864" />
+      <path
+         id="path866"
+         style="fill:#666666;stroke-width:0"
+         d="M 32,32 28,28 V 4 l 4,-4 z"
+         sodipodi:nodetypes="ccccc" />
+      <path
+         sodipodi:nodetypes="ccccc"
+         d="m 0,32 4,-4 h 24 l 4,4 z"
+         style="fill:#333333;stroke-width:0"
+         id="path868" />
+    </g>
+    <g
+       transform="translate(32)"
+       id="g889">
+      <path
+         id="rect867"
+         style="fill:#999999;stroke-width:0"
+         d="m 8,7 v 10 c 0,0.552285 0.8954305,1 2,1 1.104569,0 2,-0.447715 2,-1 V 7 Z"
+         sodipodi:nodetypes="cssscc" />
+      <path
+         id="path862"
+         style="fill:#e6e6e6;stroke-width:0"
+         d="M 12,7 A 2,1 0 0 1 10,8 2,1 0 0 1 8,7 2,1 0 0 1 10,6 2,1 0 0 1 12,7 Z" />
+      <path
+         sodipodi:nodetypes="cssscc"
+         d="m 14,11 v 10 c 0,0.552285 0.895431,1 2,1 1.104569,0 2,-0.447715 2,-1 V 11 Z"
+         style="fill:#999999;stroke-width:0"
+         id="path872" />
+      <path
+         id="ellipse874"
+         style="fill:#e6e6e6;stroke-width:0"
+         d="m 18,11 a 2,1 0 0 1 -2,1 2,1 0 0 1 -2,-1 2,1 0 0 1 2,-1 2,1 0 0 1 2,1" />
+      <path
+         id="path876"
+         style="fill:#999999;stroke-width:0"
+         d="m 20,15 v 10 c 0,0.552285 0.895431,1 2,1 1.104569,0 2,-0.447715 2,-1 V 15 Z"
+         sodipodi:nodetypes="cssscc" />
+      <path
+         id="ellipse878"
+         style="fill:#e6e6e6;stroke-width:0"
+         d="m 24,15 a 2,1 0 0 1 -2,1 2,1 0 0 1 -2,-1 2,1 0 0 1 2,-1 2,1 0 0 1 2,1" />
+    </g>
+  </g>
+</svg>

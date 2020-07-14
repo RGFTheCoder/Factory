@@ -6,7 +6,7 @@ const currentFolder =
 	currentURL.slice(0, currentURL.length - 1).join('/') + '/';
 
 export class InputMover extends OmniMover {
-	/** @type {{[key:string]:RegExp|'number'|'string'|'item'|'machine'}} */
+	/** @type {{[key:string]:import('../../../../../Util/types.js').ViewableTypes}} */
 	editableProps = {};
 	prettyName = 'Input Mover';
 	description =

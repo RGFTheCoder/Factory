@@ -2,6 +2,7 @@ import { Item } from '../../Item/Item.js';
 import { del } from '../../Util/del.js';
 import { hasTag } from '../../Util/tags.js';
 import { Machine } from '../Machine.js';
+import { deserializeItem } from '../../Util/serialize.js';
 
 const currentURL = import.meta.url.split('/');
 const currentFolder =
@@ -12,7 +13,7 @@ export class Crafter extends Machine {
 	tags = ['system'];
 	prettyName = 'Crafter';
 	description = 'A base crafter.';
-	/** @type {{[key:string]:RegExp|'number'|'string'|'item'|'machine'}} */
+	/** @type {{[key:string]:import('../../Util/types.js').ViewableTypes}} */
 	editableProps = {
 		rotation: /^(0|90|180|270)$/,
 	};
@@ -166,10 +167,8 @@ export class Crafter extends Machine {
 		out.rotations = data.rotation;
 		out.crafterType = data.crafterType;
 		out.work = data.work;
-		out.store = data.store.map((x) => game.funcs.deserializeItem(x));
-		out.outputStack = data.outputStack.map((x) =>
-			game.funcs.deserializeItem(x)
-		);
+		out.store = data.store.map((x) => deserializeItem(x));
+		out.outputStack = data.outputStack.map((x) => deserializeItem(x));
 
 		return out;
 	}

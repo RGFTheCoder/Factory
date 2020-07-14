@@ -8,7 +8,7 @@ const currentFolder =
 	currentURL.slice(0, currentURL.length - 1).join('/') + '/';
 
 export class Sink extends Machine {
-	/** @type {{[key:string]:RegExp|'number'|'string'|'item'|'machine'}} */
+	/** @type {{[key:string]:import('../../../../../Util/types.js').ViewableTypes}} */
 	editableProps = {};
 	location = currentFolder;
 	prettyName = 'Developer Sink';

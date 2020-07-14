@@ -1,5 +1,6 @@
 import { Base } from '../Machine/Base/Base.js';
 import { MagicGrid } from '../Util/MagicGrid.js';
+import { deserializeMachine } from '../Util/serialize.js';
 
 export class Factory {
 	/**
@@ -7,6 +8,11 @@ export class Factory {
 	 */
 	world = new MagicGrid();
 	_loop = 0;
+
+	/**
+	 * @type {((machine:Base, x:number, y:number)=>boolean)[]}
+	 */
+	constraints = [];
 
 	constructor() {
 		// this.gameLoop();
@@ -40,6 +46,9 @@ export class Factory {
 	 * @param {number} y
 	 */
 	addPart(machine, x, y) {
+		for (const constraint of this.constraints) {
+			if (!constraint(machine, x, y)) return;
+		}
 		this.world.set(x, y, machine);
 	}
 	/**
@@ -78,6 +87,18 @@ export class Factory {
 		}
 
 		return this.at(position[0] + req[0], position[1] + req[1]);
+	}
+
+	serialize() {
+		return this.world.itemList
+			.map((x) => x.serialize())
+			.filter((x) => typeof x != 'undefined');
+	}
+
+	deserialize(world) {
+		for (let thing of world) {
+			deserializeMachine(thing, this);
+		}
 	}
 }
 // (x,y) -> (y,-x)

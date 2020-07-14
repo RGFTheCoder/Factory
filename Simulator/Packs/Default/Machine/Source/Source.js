@@ -10,7 +10,7 @@ const currentFolder =
 
 export class Source extends Machine {
 	tags = fixTags(['natural.source', 'capability.mine', 'system']);
-	/** @type {{[key:string]:RegExp|'number'|'string'|'item'|'machine'}} */
+	/** @type {{[key:string]:import('../../../../Util/types.js').ViewableTypes}} */
 	editableProps = {
 		itemType: 'item',
 	};

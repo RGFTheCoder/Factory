@@ -1,6 +1,7 @@
 import { Item } from '../../../../../Item/Item.js';
 import { fixTags, hasTag } from '../../../../../Util/tags.js';
 import { Base } from '../../../../../Machine/Base/Base.js';
+import { deserializeItem } from '../../../../../Util/serialize.js';
 
 const currentURL = import.meta.url.split('/');
 const currentFolder =
@@ -9,7 +10,7 @@ const currentFolder =
 export class Extractor extends Base {
 	tags = fixTags(['machine.extractor']);
 	prettyName = 'Extractor';
-	/** @type {{[key:string]:RegExp|'number'|'string'|'item'|'machine'}} */
+	/** @type {{[key:string]:import('../../../../../Util/types.js').ViewableTypes}} */
 	editableProps = {
 		rotation: /^(0|90|180|270)$/,
 		customFilter: 'string',
@@ -114,8 +115,7 @@ export class Extractor extends Base {
 	static deserialize(data, factory) {
 		const out = new this(factory, data.x, data.y);
 		out.rotations = data.rotation;
-		out.store =
-			data.store == null ? null : game.funcs.deserializeItem(data.store);
+		out.store = data.store == null ? null : deserializeItem(data.store);
 		out.reqTag = data.reqTag;
 		out.customFilter = data.customFilter;
 		return out;

@@ -4,6 +4,7 @@ import { Factory } from '../../../../../Factory/Factory.js';
 import { Item } from '../../../../../Item/Item.js';
 import { compareTags, fixTags } from '../../../../../Util/tags.js';
 import { deviate } from '../../../../../Util/random.js';
+import { deserializeItem } from '../../../../../Util/serialize.js';
 
 const currentURL = import.meta.url.split('/');
 const currentFolder =
@@ -12,7 +13,7 @@ const currentFolder =
 export class Conveyor extends Machine {
 	tags = fixTags(['machine.conveyor', 'capability.extract']);
 	prettyName = 'Conveyor';
-	/** @type {{[key:string]:RegExp|'number'|'string'|'item'|'machine'}} */
+	/** @type {{[key:string]:import('../../../../../Util/types.js').ViewableTypes}} */
 	editableProps = {
 		rotation: /^(0|90|180|270)$/,
 		// maxConcurrent: 'number',
@@ -61,10 +62,13 @@ export class Conveyor extends Machine {
 	draw2(ctx, sprites) {
 		// super.draw(ctx, sprites);
 		try {
+			// const currentProgress = 0.25;
 			const currentProgress =
 				this.store.length == this.maxConcurrent
-					? -0.25
-					: 0.75 - (Date.now() - this.lastLoop) / game.tickSpeed;
+					? 0.75 - 1
+					: 0.75 -
+					  Math.min(Date.now() - this.lastLoop, game.tickSpeed) /
+							game.tickSpeed;
 			// const currentProgress =
 			// 	0.75 - (Date.now() - this.lastLoop) / game.tickSpeed;
 			for (let item of this.store) {
@@ -197,7 +201,7 @@ export class Conveyor extends Machine {
 		out.bend = data.bend;
 		out.maxConcurrent = data.maxConcurrent;
 		out.transferRate = data.transferRate;
-		out.store = data.store.map((x) => game.funcs.deserializeItem(x));
+		out.store = data.store.map((x) => deserializeItem(x));
 		return out;
 	}
 }

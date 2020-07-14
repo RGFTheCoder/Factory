@@ -1,7 +1,12 @@
 /// <reference path="./Util/types.d.ts" />
 
-const DEV = true;
+import { deserializeMachine } from './Util/serialize.js';
 
+const DEV = true;
+const defSave = JSON.stringify({
+	world: [],
+	modList: [],
+});
 /**
  * @type {{
  * 	world: Object[];
@@ -11,15 +16,22 @@ const DEV = true;
 const data = JSON.parse(
 	localStorage.factoryData ||
 		JSON.stringify({
-			world: [],
-			modList: [],
+			default: JSON.parse(defSave),
 		})
 );
+
+const queryString = window.location.search;
+
+const urlParams = new URLSearchParams(queryString);
+const save = urlParams.get('save') ?? 'default';
+
+data[save] = data[save] ?? JSON.parse(defSave);
 
 /**
  * @type {import("./Util/types").globalConf}
  */
 globalThis.game = {
+	DEV: DEV,
 	tickSpeed: 500,
 	tickSpeedVariance: 10,
 	machines: {},
@@ -28,8 +40,11 @@ globalThis.game = {
 	platform: typeof window === 'undefined' ? 'node' : 'web',
 	globalData: {},
 	recipes: [],
-	modList: data.modList,
-	funcs: { reloadMods, deserializeItem, deserializeMachine, loadFactory },
+	save: save,
+	modList: data[save].modList,
+	funcs: { reloadMods },
+	urlParams: urlParams,
+	world: data[save].world,
 };
 
 async function reloadMods() {
@@ -37,33 +52,13 @@ async function reloadMods() {
 		await import(`./Packs/${mod}/pack.js`);
 	}
 }
-function deserializeItem(data) {
-	//@ts-ignore
-	return game.items[data.type].deserialize(data);
-}
 
-/**
- *
- * @param {Object} data
- * @param {import('./Factory/Factory.js').Factory} factory
- */
-function deserializeMachine(data, factory) {
-	//@ts-ignore
-	return game.machines[data.type].deserialize(data, factory);
-}
-
-async function loadFactory() {
-	const world = data.world;
-	for (let thing of world) {
-		deserializeMachine(thing, game.factory);
+addEventListener('unload', function onunload() {
+	if (urlParams.get('clearData')) {
+		delete localStorage.factoryData;
+		return;
 	}
-}
+	data[save].world = game.factory.serialize();
 
-function saveFactory() {
-	return game.factory.world.itemList.map((x) => x.serialize());
-}
-
-addEventListener('unload', () => {
-	data.world = saveFactory();
-	localStorage.factoryData = JSON.stringify(data);
+	if (!urlParams.get('noSave')) localStorage.factoryData = JSON.stringify(data);
 });

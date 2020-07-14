@@ -21,7 +21,10 @@ export class Item {
 	constructor() {
 		this.tags = fixTags(this.tags);
 		this.prettyName = this.prettyName ?? this.name;
+		this.init();
 	}
+
+	init() {}
 
 	toString() {
 		return this.name;

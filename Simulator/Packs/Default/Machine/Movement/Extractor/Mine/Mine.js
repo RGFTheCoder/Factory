@@ -13,7 +13,7 @@ export class Mine extends Extractor {
 	description = 'A mine that mines things from sources.';
 
 	reqTag = 'capability.mine';
-	/** @type {{[key:string]:RegExp|'number'|'string'|'item'|'machine'}} */
+	/** @type {{[key:string]:import('../../../../../../Util/types.js').ViewableTypes}} */
 	editableProps = {
 		rotation: /^(0|90|180|270)$/,
 	};

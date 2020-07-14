@@ -1,6 +1,7 @@
 import { Machine } from '../../../../Machine/Machine.js';
 
 import { Item } from '../../../../Item/Item.js';
+import { deserializeItem } from '../../../../Util/serialize.js';
 
 const currentURL = import.meta.url.split('/');
 const currentFolder =
@@ -11,7 +12,7 @@ game.globalData.Storage = game.globalData.Storage ?? {
 };
 
 export class Storage extends Machine {
-	/** @type {{[key:string]:RegExp|'number'|'string'|'item'|'machine'}} */
+	/** @type {{[key:string]:import('../../../../Util/types.js').ViewableTypes}} */
 	editableProps = {
 		// capacity: 'number',
 		// inventory: 'string',
@@ -70,7 +71,7 @@ export class Storage extends Machine {
 	static deserialize(data) {
 		const out = new this();
 		out.capacity = data.capacity;
-		out.inventory = data.inventory.map((x) => game.funcs.deserializeItem(x));
+		out.inventory = data.inventory.map((x) => deserializeItem(x));
 		return out;
 	}
 }
