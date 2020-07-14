@@ -13,8 +13,8 @@ game.globalData.Storage = game.globalData.Storage ?? {
 export class Storage extends Machine {
 	/** @type {{[key:string]:RegExp|'number'|'string'|'item'|'machine'}} */
 	editableProps = {
-		capacity: 'number',
-		inventory: 'string',
+		// capacity: 'number',
+		// inventory: 'string',
 	};
 	prettyName = 'Storage';
 	location = currentFolder;
@@ -52,6 +52,27 @@ export class Storage extends Machine {
 	capacity = 10;
 
 	async loop() {}
+
+	/**
+	 * convert an item into JSON representation. Must have type set to the registered name.
+	 */
+	serialize() {
+		return {
+			type: this.name,
+			capacity: this.capacity,
+			inventory: this.inventory.map((x) => x.serialize()),
+		};
+	}
+
+	/**
+	 * convert an item into JSON representation.
+	 */
+	static deserialize(data) {
+		const out = new this();
+		out.capacity = data.capacity;
+		out.inventory = data.inventory.map((x) => game.funcs.deserializeItem(x));
+		return out;
+	}
 }
 
 // @ts-ignore

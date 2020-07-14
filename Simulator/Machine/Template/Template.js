@@ -1,5 +1,5 @@
-import { Item } from '../../../../Item/Item.js';
-import { Base } from '../../../../Machine/Base/Base.js';
+import { Item } from '../../Item/Item.js';
+import { Base } from '../Base/Base.js';
 
 const currentURL = import.meta.url.split('/');
 const currentFolder =

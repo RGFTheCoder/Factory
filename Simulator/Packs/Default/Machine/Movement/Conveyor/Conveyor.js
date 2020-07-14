@@ -15,8 +15,8 @@ export class Conveyor extends Machine {
 	/** @type {{[key:string]:RegExp|'number'|'string'|'item'|'machine'}} */
 	editableProps = {
 		rotation: /^(0|90|180|270)$/,
-		maxConcurrent: 'number',
-		transferRate: 'number',
+		// maxConcurrent: 'number',
+		// transferRate: 'number',
 		bend: /^[SRL]$/,
 	};
 
@@ -168,6 +168,36 @@ export class Conveyor extends Machine {
 		for (let item of out) {
 			this.store.splice(this.store.indexOf(item), 1);
 		}
+		return out;
+	}
+
+	/**
+	 * convert an item into JSON representation. Must have type set to the registered name.
+	 * @returns {Object}
+	 */
+	serialize() {
+		return {
+			type: this.name,
+			x: this.xpos,
+			y: this.ypos,
+			rotation: this.rotations,
+			bend: this.bend,
+			store: this.store.map((x) => x.serialize()),
+			maxConcurrent: this.maxConcurrent,
+			transferRate: this.transferRate,
+		};
+	}
+
+	/**
+	 * convert an item into JSON representation.
+	 */
+	static deserialize(data, factory) {
+		const out = new this(factory, data.x, data.y);
+		out.rotations = data.rotation;
+		out.bend = data.bend;
+		out.maxConcurrent = data.maxConcurrent;
+		out.transferRate = data.transferRate;
+		out.store = data.store.map((x) => game.funcs.deserializeItem(x));
 		return out;
 	}
 }

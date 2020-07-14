@@ -15,6 +15,8 @@ export class Extractor extends Base {
 		customFilter: 'string',
 	};
 
+	layers = 4;
+
 	location = currentFolder;
 	description = 'An extractor that removes items from a machine.';
 
@@ -26,13 +28,7 @@ export class Extractor extends Base {
 	reqTag = 'capability.extract';
 	customFilter = '';
 
-	/**
-	 *
-	 * @param {CanvasRenderingContext2D} ctx
-	 * @param {{[key:string]:HTMLImageElement}} sprites
-	 */
 	draw3(ctx, sprites) {
-		// upper layer (above items)
 		try {
 			ctx.drawImage(
 				sprites[this.location + 'ExtractorBase' + '.svg'],
@@ -41,6 +37,17 @@ export class Extractor extends Base {
 				1,
 				1
 			);
+		} catch (e) {}
+	}
+
+	/**
+	 *
+	 * @param {CanvasRenderingContext2D} ctx
+	 * @param {{[key:string]:HTMLImageElement}} sprites
+	 */
+	draw4(ctx, sprites) {
+		// upper layer (above items)
+		try {
 			ctx.drawImage(sprites[this.location + this.name + '.svg'], 0, 0, 1, 2);
 		} catch (e) {}
 	}
@@ -83,6 +90,35 @@ export class Extractor extends Base {
 	 */
 	pullItem(...tags) {
 		return null;
+	}
+
+	/**
+	 * convert an item into JSON representation. Must have type set to the registered name.
+	 * @returns {Object}
+	 */
+	serialize() {
+		return {
+			type: this.name,
+			x: this.xpos,
+			y: this.ypos,
+			rotation: this.rotations,
+			store: this.store == null ? null : this.store.serialize(),
+			reqTag: this.reqTag,
+			customFilter: this.customFilter,
+		};
+	}
+
+	/**
+	 * convert an item into JSON representation.
+	 */
+	static deserialize(data, factory) {
+		const out = new this(factory, data.x, data.y);
+		out.rotations = data.rotation;
+		out.store =
+			data.store == null ? null : game.funcs.deserializeItem(data.store);
+		out.reqTag = data.reqTag;
+		out.customFilter = data.customFilter;
+		return out;
 	}
 }
 

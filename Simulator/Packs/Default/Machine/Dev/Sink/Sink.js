@@ -9,9 +9,7 @@ const currentFolder =
 
 export class Sink extends Machine {
 	/** @type {{[key:string]:RegExp|'number'|'string'|'item'|'machine'}} */
-	editableProps = {
-		rotation: /^(0|90|180|270)$/,
-	};
+	editableProps = {};
 	location = currentFolder;
 	prettyName = 'Developer Sink';
 	description = 'A simple sink that logs when things are inputted';
@@ -29,6 +27,26 @@ export class Sink extends Machine {
 
 		del(item);
 		return true;
+	}
+
+	/**
+	 * convert an item into JSON representation. Must have type set to the registered name.
+	 * @returns {Object}
+	 */
+	serialize() {
+		return {
+			type: this.name,
+			x: this.xpos,
+			y: this.ypos,
+		};
+	}
+
+	/**
+	 * convert an item into JSON representation.
+	 */
+	static deserialize(data, factory) {
+		const out = new this(factory, data.x, data.y);
+		return out;
 	}
 }
 

@@ -5,6 +5,8 @@ const currentFolder =
 	currentURL.slice(0, currentURL.length - 1).join('/') + '/';
 
 export class Machine extends Base {
+	/** @type {string[]} */
+	tags = ['system'];
 	/** @type {{[key:string]:RegExp|'number'|'string'|'item'|'machine'}} */
 	editableProps = {
 		rotation: /^(0|90|180|270)$/,
@@ -61,4 +63,27 @@ export class Machine extends Base {
 	 * Function that is called many times per second
 	 */
 	async loop() {}
+
+	/**
+	 * convert an item into JSON representation. Must have type set to the registered name.
+	 * @returns {Object}
+	 */
+	serialize() {
+		return {
+			type: this.name,
+			x: this.xpos,
+			y: this.ypos,
+			rotation: this.rotations,
+		};
+	}
+
+	/**
+	 * convert an item into JSON representation.
+	 */
+	static deserialize(data, factory) {
+		const out = new this(factory, data.x, data.y);
+		out.rotations = data.rotation;
+		return out;
+	}
 }
+game.machines['Machine'] = Machine;

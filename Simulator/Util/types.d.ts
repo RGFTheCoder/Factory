@@ -15,16 +15,19 @@ type globalConf = {
 	tickSpeed: number;
 	tickSpeedVariance: number;
 	machines: {
-		[keys: string]: new (factory: Factory, x: number, y: number) => Base;
+		[keys: string]: typeof Base;
 	};
-	items: { [keys: string]: Class<Item> };
+	items: { [keys: string]: typeof Item };
 	factory: Factory | null;
 	platform: 'node' | 'web';
 	globalData: { [key: string]: any };
 	recipes: Recipe[];
 	modList: string[];
 	funcs: {
-		reloadMods(): void;
+		reloadMods(): Promise<void>;
+		deserializeItem(data: Object): Item;
+		deserializeMachine(data: Object, factory: Factory): Base;
+		loadFactory(): Promise<void>;
 	};
 };
 declare namespace NodeJS {

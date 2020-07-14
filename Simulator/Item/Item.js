@@ -26,5 +26,23 @@ export class Item {
 	toString() {
 		return this.name;
 	}
+
+	/**
+	 * convert an item into JSON representation. Must have type set to the registered name.
+	 */
+	serialize() {
+		return {
+			type: this.name,
+		};
+	}
+
+	/**
+	 * convert an item into JSON representation.
+	 */
+	static deserialize(data) {
+		const out = new this();
+
+		return out;
+	}
 }
 game.items['Item'] = Item;

@@ -18,13 +18,7 @@ export class Mine extends Extractor {
 		rotation: /^(0|90|180|270)$/,
 	};
 
-	/**
-	 *
-	 * @param {CanvasRenderingContext2D} ctx
-	 * @param {{[key:string]:HTMLImageElement}} sprites
-	 */
 	draw3(ctx, sprites) {
-		// upper layer (above items)
 		try {
 			ctx.drawImage(
 				sprites[this.location + '../ExtractorBase' + '.svg'],
@@ -33,6 +27,17 @@ export class Mine extends Extractor {
 				1,
 				1
 			);
+		} catch (error) {}
+	}
+
+	/**
+	 *
+	 * @param {CanvasRenderingContext2D} ctx
+	 * @param {{[key:string]:HTMLImageElement}} sprites
+	 */
+	draw4(ctx, sprites) {
+		// upper layer (above items)
+		try {
 			ctx.drawImage(sprites[this.location + this.name + '.svg'], 0, 0, 1, 2);
 		} catch (e) {}
 	}

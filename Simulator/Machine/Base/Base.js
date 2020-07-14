@@ -7,11 +7,13 @@ const currentFolder =
 
 export class Base {
 	/** @type {string[]} */
-	tags = [];
+	tags = ['system'];
 	/** @type {{[key:string]:RegExp|'number'|'string'|'item'|'machine'}} */
 	editableProps = {
 		rotation: /^(0|90|180|270)$/,
 	};
+
+	layers = 3;
 
 	location = currentFolder;
 	// name = 'Machine';
@@ -156,7 +158,30 @@ export class Base {
 		return out;
 	}
 
+	/**
+	 * convert an item into JSON representation. Must have type set to the registered name.
+	 * @returns {Object}
+	 */
+	serialize() {
+		return {
+			type: this.name,
+			x: this.xpos,
+			y: this.ypos,
+			rotation: this.rotations,
+		};
+	}
+
+	/**
+	 * convert an item into JSON representation.
+	 */
+	static deserialize(data, factory) {
+		const out = new this(factory, data.x, data.y);
+		out.rotations = data.rotation;
+		return out;
+	}
+
 	toString() {
 		return this.name;
 	}
 }
+game.machines['Base'] = Base;

@@ -8,6 +8,8 @@ const currentFolder =
 	currentURL.slice(0, currentURL.length - 1).join('/') + '/';
 
 export class Crafter extends Machine {
+	/** @type {string[]} */
+	tags = ['system'];
 	prettyName = 'Crafter';
 	description = 'A base crafter.';
 	/** @type {{[key:string]:RegExp|'number'|'string'|'item'|'machine'}} */
@@ -138,6 +140,38 @@ export class Crafter extends Machine {
 		}
 
 		return false;
+	}
+
+	/**
+	 * convert an item into JSON representation. Must have type set to the registered name.
+	 */
+	serialize() {
+		return {
+			type: this.name,
+			x: this.xpos,
+			y: this.ypos,
+			rotation: this.rotations,
+			crafterType: this.crafterType,
+			work: this.work,
+			store: this.store.map((x) => x.serialize()),
+			outputStack: this.outputStack.map((x) => x.serialize()),
+		};
+	}
+
+	/**
+	 * convert an item into JSON representation.
+	 */
+	static deserialize(data, factory) {
+		const out = new this(factory, data.x, data.y);
+		out.rotations = data.rotation;
+		out.crafterType = data.crafterType;
+		out.work = data.work;
+		out.store = data.store.map((x) => game.funcs.deserializeItem(x));
+		out.outputStack = data.outputStack.map((x) =>
+			game.funcs.deserializeItem(x)
+		);
+
+		return out;
 	}
 }
 game.machines['Crafter'] = Crafter;

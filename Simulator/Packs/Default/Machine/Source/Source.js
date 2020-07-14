@@ -9,7 +9,7 @@ const currentFolder =
 	currentURL.slice(0, currentURL.length - 1).join('/') + '/';
 
 export class Source extends Machine {
-	tags = fixTags(['natural.source', 'capability.mine']);
+	tags = fixTags(['natural.source', 'capability.mine', 'system']);
 	/** @type {{[key:string]:RegExp|'number'|'string'|'item'|'machine'}} */
 	editableProps = {
 		itemType: 'item',
@@ -18,7 +18,7 @@ export class Source extends Machine {
 	description = 'A natural concentration of materials';
 	location = currentFolder;
 	/**
-	 * @type {import('../../../../Util/types.js').Class<Item>}
+	 * @type {typeof import('../../../../Item/Item.js').Item}
 	 */
 	itemType = Item;
 
@@ -90,6 +90,36 @@ export class Source extends Machine {
 			del(possibleItem);
 			return null;
 		}
+	}
+
+	/**
+	 * convert an item into JSON representation. Must have type set to the registered name.
+	 * @returns {Object}
+	 */
+	serialize() {
+		const tempItem = new this.itemType();
+		const out = {
+			type: this.name,
+			x: this.xpos,
+			y: this.ypos,
+			rotation: this.rotations,
+			amount: this.amount,
+			itemType: tempItem.name,
+		};
+		del(tempItem);
+		return out;
+	}
+
+	/**
+	 * convert an item into JSON representation.
+	 */
+	static deserialize(data, factory) {
+		const out = new this(factory, data.x, data.y);
+		out.rotations = data.rotation;
+		out.amount = data.amount;
+		out.itemType = game.items[data.itemType];
+
+		return out;
 	}
 }
 

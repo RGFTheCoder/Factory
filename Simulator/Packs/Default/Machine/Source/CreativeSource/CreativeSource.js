@@ -86,6 +86,34 @@ export class CreativeSource extends Machine {
 			return null;
 		}
 	}
+
+	/**
+	 * convert an item into JSON representation. Must have type set to the registered name.
+	 * @returns {Object}
+	 */
+	serialize() {
+		const tempItem = new this.itemType();
+		const out = {
+			type: this.name,
+			x: this.xpos,
+			y: this.ypos,
+			rotation: this.rotations,
+			itemType: tempItem.name,
+		};
+		del(tempItem);
+		return out;
+	}
+
+	/**
+	 * convert an item into JSON representation.
+	 */
+	static deserialize(data, factory) {
+		const out = new this(factory, data.x, data.y);
+		out.rotations = data.rotation;
+		out.itemType = game.items[data.itemType];
+
+		return out;
+	}
 }
 
 // @ts-ignore

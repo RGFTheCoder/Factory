@@ -1,6 +1,6 @@
 /// <reference path="../Simulator/Util/types.d.ts" />
 /// <reference path="./types.d.ts" />
-import '../Simulator/global.js';
+// import {} from '../Simulator/global.js';
 
 import { Factory } from '../Simulator/Factory/Factory.js';
 import { Item } from '../Simulator/Item/Item.js';
@@ -67,6 +67,8 @@ function getSpriteUrl(item) {
 }
 
 game.factory = factory;
+
+game.funcs.reloadMods().then(() => game.funcs.loadFactory());
 
 factory.gameLoop();
 
@@ -154,7 +156,7 @@ function draw() {
 	);
 	ctx.restore();
 
-	const shownTiles = factory.world.itemList.filter(
+	let shownTiles = factory.world.itemList.filter(
 		(mach) =>
 			mach.xpos > bounds.x - 1 &&
 			mach.xpos <= bounds.x + bounds.w &&
@@ -167,24 +169,21 @@ function draw() {
 		ctx.translate(tile.xpos + 0.5, tile.ypos + 0.5);
 		ctx.rotate((Math.PI / 2) * tile.rotations);
 		ctx.translate(-0.5, -0.5);
-		tile.draw(ctx, sprites);
+		tile?.draw?.(ctx, sprites);
 		ctx.restore();
 	}
-	for (const tile of shownTiles) {
-		ctx.save();
-		ctx.translate(tile.xpos + 0.5, tile.ypos + 0.5);
-		ctx.rotate((Math.PI / 2) * tile.rotations);
-		ctx.translate(-0.5, -0.5);
-		tile.draw2(ctx, sprites);
-		ctx.restore();
-	}
-	for (const tile of shownTiles) {
-		ctx.save();
-		ctx.translate(tile.xpos + 0.5, tile.ypos + 0.5);
-		ctx.rotate((Math.PI / 2) * tile.rotations);
-		ctx.translate(-0.5, -0.5);
-		tile.draw3(ctx, sprites);
-		ctx.restore();
+
+	for (let layer = 1; shownTiles.length > 0; layer++) {
+		shownTiles = shownTiles.filter((x) => x.layers >= layer);
+
+		for (const tile of shownTiles) {
+			ctx.save();
+			ctx.translate(tile.xpos + 0.5, tile.ypos + 0.5);
+			ctx.rotate((Math.PI / 2) * tile.rotations);
+			ctx.translate(-0.5, -0.5);
+			tile?.['draw' + layer]?.(ctx, sprites);
+			ctx.restore();
+		}
 	}
 
 	ctx.fillStyle = '#ff000040';
@@ -406,7 +405,6 @@ let currentMode = 'edit';
 								item.appendChild(inpu);
 								item.append(document.createTextNode("'"));
 								inpu.addEventListener('keyup', (ev) => {
-									console.log(ev.key);
 									looked[id] = inpu.value;
 									defProps[id] = inpu.value;
 								});
@@ -424,8 +422,8 @@ let currentMode = 'edit';
 									const text = inpu.value;
 									if (data.test(text)) {
 										inpu.classList.remove('err');
-										looked[id] = inpu.value + ev.key;
-										defProps[id] = inpu.value + ev.key;
+										looked[id] = inpu.value;
+										defProps[id] = inpu.value;
 									} else {
 										inpu.classList.add('err');
 									}
@@ -554,7 +552,7 @@ let currentMode = 'edit';
 							const text = inpu.value;
 							if (data.test(text)) {
 								inpu.classList.remove('err');
-								looked[id] = inpu.value + ev.key;
+								looked[id] = inpu.value;
 							} else {
 								inpu.classList.add('err');
 							}
