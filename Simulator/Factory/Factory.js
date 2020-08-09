@@ -65,8 +65,30 @@ export class Factory {
 	 */
 	async loop() {
 		for (const item of this.world.itemList) {
-			item.loop();
+			item.loopTime++;
+			if (item.loopTime == item.loopSpeed) {
+				item.loopTime = 0;
+			}
 		}
+
+		for (const item of this.world.itemList) {
+			if (item.loopTime == 0) {
+				item.loop();
+			}
+		}
+
+		let items = [...this.world.itemList];
+
+		for (let layer = 1; items.length > 0; layer++) {
+			items = items.filter((x) => x.uLayers >= layer);
+
+			for (const item of items) {
+				if (item.loopTime == 0) {
+					item?.['loop' + layer]?.();
+				}
+			}
+		}
+
 		if (this.world.itemList.length > 1)
 			this.world.itemList.push(this.world.itemList.shift());
 	}

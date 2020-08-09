@@ -19,6 +19,8 @@ import { sprites } from './SpriteGen.js';
 import { del } from '../Simulator/Util/del.js';
 import { Base } from '../Simulator/Machine/Base/Base.js';
 import { hasTag } from '../Simulator/Util/tags.js';
+import { Machine } from '../Simulator/Machine/Machine.js';
+import { deserializeMachine } from '../Simulator/Util/serialize.js';
 // import { Base } from '../Simulator/Machine/Base/Base.js';
 
 const factory = new Factory();
@@ -68,7 +70,6 @@ function getSpriteUrl(item) {
 }
 
 game.factory = factory;
-
 game.funcs
 	.reloadMods()
 	.then(() => !game.urlParams.get('noLoad') && factory.deserialize(game.world));
@@ -89,6 +90,7 @@ addEventListener('resize', () => {
 });
 
 const ctx = canvas.getContext('2d');
+const ctxWorld = canvas.getContext('2d');
 
 const camera = {
 	x: 0,
@@ -132,6 +134,7 @@ const mouse = {
 function draw() {
 	ctx.save();
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
+	ctxWorld.save();
 
 	camera.x += (camera.dx - camera.x) * camera.lerp;
 	camera.y += (camera.dy - camera.y) * camera.lerp;
@@ -140,6 +143,10 @@ function draw() {
 	ctx.translate(canvas.width / 2, canvas.height / 2);
 	ctx.scale(camera.zoom, camera.zoom);
 	ctx.translate(-camera.x, -camera.y);
+
+	// ctxWorld.translate(canvas.width / 2, canvas.height / 2);
+	// ctxWorld.scale(camera.zoom, camera.zoom);
+	// ctxWorld.translate(-camera.x, -camera.y);
 	/* DRAW START */
 
 	// ctx.fillRect(bounds.x, bounds.y, bounds.w, bounds.h);
@@ -172,7 +179,7 @@ function draw() {
 		ctx.translate(tile.xpos + 0.5, tile.ypos + 0.5);
 		ctx.rotate((Math.PI / 2) * tile.rotations);
 		ctx.translate(-0.5, -0.5);
-		tile?.draw?.(ctx, sprites);
+		tile?.draw?.(ctx, sprites, ctxWorld);
 		ctx.restore();
 	}
 
@@ -189,12 +196,31 @@ function draw() {
 		}
 	}
 
+	shownTiles = factory.world.itemList.filter(
+		(mach) =>
+			mach.xpos > bounds.x - 1 &&
+			mach.xpos <= bounds.x + bounds.w &&
+			mach.ypos > bounds.y - 1 &&
+			mach.ypos <= bounds.y + bounds.h
+	);
+
+	for (let layer = 1; shownTiles.length > 0; layer++) {
+		shownTiles = shownTiles.filter((x) => x.layers >= layer);
+
+		for (const tile of shownTiles) {
+			ctx.save();
+			tile?.['wdraw' + layer]?.(ctx, sprites);
+			ctx.restore();
+		}
+	}
+
 	ctx.fillStyle = '#ff000040';
 	ctx.fillRect(mouse.x, mouse.y, 1, 1);
 
 	/* DRAW END */
 
 	ctx.restore();
+	ctxWorld.restore();
 
 	/* UI START */
 	// ctx.fillStyle = '#ff000080';
@@ -288,35 +314,75 @@ let currentMode = 'edit';
 	ToolPanel.style['width'] = '15cm';
 	ToolPanel.style['height'] = '1cm';
 
-	const newButton = document.createElement('button');
-	const newButtonImage = document.createElement('img');
-	newButtonImage.src = '/Simulator/MiscAssets/New.svg';
-	newButton.appendChild(newButtonImage);
-	newButton.addEventListener('click', () => {
-		currentMode = 'new';
-	});
+	{
+		const newButton = document.createElement('button');
+		const newButtonImage = document.createElement('img');
+		newButtonImage.src = '/Simulator/MiscAssets/New.svg';
+		newButton.appendChild(newButtonImage);
+		newButton.addEventListener('click', () => {
+			currentMode = 'new';
+		});
 
-	ToolPanel.appendChild(newButton);
-	const editButton = document.createElement('button');
-	const editButtonImage = document.createElement('img');
-	editButtonImage.src = '/Simulator/MiscAssets/Edit.svg';
-	editButton.appendChild(editButtonImage);
-	editButton.addEventListener('click', () => {
-		currentMode = 'edit';
-	});
+		ToolPanel.appendChild(newButton);
+	}
+	{
+		const editButton = document.createElement('button');
+		const editButtonImage = document.createElement('img');
+		editButtonImage.src = '/Simulator/MiscAssets/Edit.svg';
+		editButton.appendChild(editButtonImage);
+		editButton.addEventListener('click', () => {
+			currentMode = 'edit';
+		});
 
-	ToolPanel.appendChild(editButton);
-	const deleteButton = document.createElement('button');
-	const deleteButtonImage = document.createElement('img');
-	deleteButtonImage.src = '/Simulator/MiscAssets/Delete.svg';
-	deleteButton.appendChild(deleteButtonImage);
-	deleteButton.addEventListener('click', () => {
-		currentMode = 'delete';
-	});
+		ToolPanel.appendChild(editButton);
+	}
+	{
+		const deleteButton = document.createElement('button');
+		const deleteButtonImage = document.createElement('img');
+		deleteButtonImage.src = '/Simulator/MiscAssets/Delete.svg';
+		deleteButton.appendChild(deleteButtonImage);
+		deleteButton.addEventListener('click', () => {
+			currentMode = 'delete';
+		});
 
-	ToolPanel.appendChild(deleteButton);
+		ToolPanel.appendChild(deleteButton);
+	}
+	{
+		const cloneButton = document.createElement('button');
+		const cloneButtonImage = document.createElement('img');
+		cloneButtonImage.src = '/Simulator/MiscAssets/Clone.svg';
+		cloneButton.appendChild(cloneButtonImage);
+		cloneButton.addEventListener('click', () => {
+			currentMode = 'clone';
+		});
+
+		ToolPanel.appendChild(cloneButton);
+	}
 
 	UI.appendChild(ToolPanel);
+}
+
+{
+	/** @type {Base} */
+	let selected = null;
+	UIUpdates.push((type) => {
+		if (currentMode == 'clone') {
+			if (selected == null) {
+				if (type == 'click') {
+					selected = factory.at(mouse.x, mouse.y);
+				}
+			} else {
+				if (type == 'click' || type == 'drag') {
+					const copy = selected.serialize();
+					copy.x = mouse.x;
+					copy.y = mouse.y;
+					deserializeMachine(copy, factory);
+				}
+			}
+		} else {
+			selected = null;
+		}
+	});
 }
 
 {
@@ -341,6 +407,10 @@ let currentMode = 'edit';
 	MachineList.appendChild(params);
 
 	UI.appendChild(MachineList);
+
+	let lastBuilt = null;
+	/** @type {0|1|2|3} */
+	let currDir = 0;
 
 	UIUpdates.push((type) => {
 		if (currentMode == 'new' && MachineList.hidden == true) {
@@ -451,11 +521,39 @@ let currentMode = 'edit';
 			}
 		}
 
-		if (currentMode != 'new') MachineList.hidden = true;
-		else MachineList.hidden = false;
+		if (currentMode != 'new') {
+			lastBuilt = null;
+			currDir = 0;
+			MachineList.hidden = true;
+		} else MachineList.hidden = false;
 		if ((type == 'click' || type == 'drag') && currentMode == 'new') {
 			if (selected != null) {
 				const building = new selected(factory, mouse.x, mouse.y);
+				if (lastBuilt != null) {
+					if (mouse.x - lastBuilt.xpos == 0 && mouse.y - lastBuilt.ypos == -1) {
+						currDir = 0;
+					} else if (
+						mouse.x - lastBuilt.xpos == 1 &&
+						mouse.y - lastBuilt.ypos == 0
+					) {
+						currDir = 1;
+					} else if (
+						mouse.x - lastBuilt.xpos == 0 &&
+						mouse.y - lastBuilt.ypos == 1
+					) {
+						currDir = 2;
+					} else if (
+						mouse.x - lastBuilt.xpos == -1 &&
+						mouse.y - lastBuilt.ypos == 0
+					) {
+						currDir = 3;
+					}
+				}
+
+				building.rotations = currDir;
+				if (lastBuilt != null) lastBuilt.rotations = currDir;
+
+				lastBuilt = building;
 				for (let id in defProps) {
 					building[id] = defProps[id];
 				}
@@ -492,7 +590,9 @@ let currentMode = 'edit';
 
 		if (type == 'click') {
 			const looked = factory.at(mouse.x, mouse.y);
-			if (looked == null || currentMode != 'edit') {
+			if (looked != null && currentMode == 'edit') {
+				InfoPanel.hidden = false;
+			} else if (looked == null) {
 				InfoPanel.hidden = true;
 				return;
 			}

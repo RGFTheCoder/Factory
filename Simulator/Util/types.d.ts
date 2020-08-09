@@ -20,6 +20,11 @@ type ViewableTypes =
 	| 'none'
 	| ((elm: HTMLDivElement) => void);
 
+type Structure = {
+	chancePerChunk: number;
+	createStructure(factory: Factory, x: number, y: number): void;
+};
+
 type globalConf = {
 	DEV: boolean;
 	tickSpeed: number;
@@ -32,6 +37,7 @@ type globalConf = {
 	platform: 'node' | 'web';
 	globalData: { [key: string]: any };
 	recipes: Recipe[];
+	structures: Structure[];
 	modList: string[];
 	funcs: {
 		reloadMods(): Promise<void>;

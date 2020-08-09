@@ -32,7 +32,7 @@ data[save] = data[save] ?? JSON.parse(defSave);
  */
 globalThis.game = {
 	DEV: DEV,
-	tickSpeed: 500,
+	tickSpeed: 20,
 	tickSpeedVariance: 10,
 	machines: {},
 	items: {},
@@ -45,6 +45,7 @@ globalThis.game = {
 	funcs: { reloadMods },
 	urlParams: urlParams,
 	world: data[save].world,
+	structures: [],
 };
 
 async function reloadMods() {

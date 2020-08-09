@@ -12,6 +12,8 @@ const currentFolder =
 	currentURL.slice(0, currentURL.length - 1).join('/') + '/';
 
 export class MicroFactory extends Base {
+	loopSpeed = 1;
+
 	location = currentFolder;
 	prettyName = 'Micro Factory';
 	description = 'A compressed factory';
@@ -56,8 +58,8 @@ export class MicroFactory extends Base {
 	/** @type {Item} */
 	outStore = null;
 
-	_width = 5;
-	_height = 5;
+	_width = 6;
+	_height = 6;
 	get width() {
 		return this._width * 2;
 	}
@@ -95,11 +97,14 @@ export class MicroFactory extends Base {
 		/**
 		 * @type {globalThis}
 		 */
+
 		// @ts-ignore
 		const interfac = open(
 			'/WebInterface/?save=' +
 				game.save +
-				'&noLoad=true&noSave=true&noLoop=true'
+				'&noLoad=true&noSave=true&noLoop=true',
+			'',
+			'directories=no,location=no,menubar=no,status=no,titlebar=no,toolbar=no,scrollbars=no,width=600,height=400,resizeable=yes'
 		);
 
 		interfac.addEventListener('load', () => {

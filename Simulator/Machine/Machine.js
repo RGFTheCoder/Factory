@@ -12,6 +12,8 @@ export class Machine extends Base {
 		rotation: /^(0|90|180|270)$/,
 	};
 
+	layers = 3;
+
 	location = currentFolder;
 
 	/**

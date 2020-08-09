@@ -6,6 +6,8 @@ const currentFolder =
 	currentURL.slice(0, currentURL.length - 1).join('/') + '/';
 
 export class Base {
+	loopSpeed = 500 / game.tickSpeed;
+	loopTime = 0;
 	/** @type {string[]} */
 	tags = ['system'];
 	/** @type {{[key:string]:import('../../Util/types.js').ViewableTypes}} */
@@ -14,6 +16,7 @@ export class Base {
 	};
 
 	layers = 3;
+	uLayers = 0;
 
 	location = currentFolder;
 	// name = 'Machine';
@@ -72,8 +75,9 @@ export class Base {
 	 *
 	 * @param {CanvasRenderingContext2D} ctx
 	 * @param {{[key:string]:HTMLImageElement}} sprites
+	 * @param {CanvasRenderingContext2D} ctxWorld
 	 */
-	draw(ctx, sprites) {
+	draw(ctx, sprites, ctxWorld) {
 		try {
 		} catch (e) {}
 	}
@@ -82,8 +86,9 @@ export class Base {
 	 *
 	 * @param {CanvasRenderingContext2D} ctx
 	 * @param {{[key:string]:HTMLImageElement}} sprites
+	 * @param {CanvasRenderingContext2D} ctxWorld
 	 */
-	draw2(ctx, sprites) {
+	draw2(ctx, sprites, ctxWorld) {
 		try {
 		} catch (e) {}
 	}
@@ -92,8 +97,9 @@ export class Base {
 	 *
 	 * @param {CanvasRenderingContext2D} ctx
 	 * @param {{[key:string]:HTMLImageElement}} sprites
+	 * @param {CanvasRenderingContext2D} ctxWorld
 	 */
-	draw3(ctx, sprites) {
+	draw3(ctx, sprites, ctxWorld) {
 		try {
 		} catch (e) {}
 	}

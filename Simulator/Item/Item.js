@@ -1,10 +1,18 @@
 import { fixTags } from '../Util/tags.js';
+import { V2 } from '../Util/Vec2.js';
 
 const currentURL = import.meta.url.split('/');
 const currentFolder =
 	currentURL.slice(0, currentURL.length - 1).join('/') + '/';
 
 export class Item {
+	optMovablePos = {
+		target: new V2(),
+		current: new V2(),
+	};
+
+	loopSpeed = 500 / game.tickSpeed;
+	loopTime = 0;
 	get name() {
 		const splitLoc = this.location.split('/');
 		return splitLoc[splitLoc.length - 2];

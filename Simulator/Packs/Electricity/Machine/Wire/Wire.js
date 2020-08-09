@@ -1,20 +1,20 @@
-import { Machine } from '../../../../../Machine/Machine.js';
+import { Machine } from '../../../../Machine/Machine.js';
 
-import { Factory } from '../../../../../Factory/Factory.js';
-import { Item } from '../../../../../Item/Item.js';
-import { compareTags, fixTags } from '../../../../../Util/tags.js';
-import { deviate } from '../../../../../Util/random.js';
-import { deserializeItem } from '../../../../../Util/serialize.js';
-import { V2 } from '../../../../../Util/Vec2.js';
+import { Factory } from '../../../../Factory/Factory.js';
+import { Item } from '../../../../Item/Item.js';
+import { compareTags, fixTags, hasTag } from '../../../../Util/tags.js';
+import { deviate } from '../../../../Util/random.js';
+import { deserializeItem } from '../../../../Util/serialize.js';
+import { V2 } from '../../../../Util/Vec2.js';
 
 const currentURL = import.meta.url.split('/');
 const currentFolder =
 	currentURL.slice(0, currentURL.length - 1).join('/') + '/';
 
-export class Conveyor extends Machine {
-	tags = fixTags(['machine.conveyor', 'capability.extract']);
-	prettyName = 'Conveyor';
-	/** @type {{[key:string]:import('../../../../../Util/types.js').ViewableTypes}} */
+export class Wire extends Machine {
+	tags = fixTags(['machine.wire', 'capability.extract']);
+	prettyName = 'Wire';
+	/** @type {{[key:string]:import('../../../../Util/types.js').ViewableTypes}} */
 	editableProps = {
 		rotation: /^(0|90|180|270)$/,
 		// maxConcurrent: 'number',
@@ -23,8 +23,7 @@ export class Conveyor extends Machine {
 	};
 
 	location = currentFolder;
-	description = 'A conveyor that carries items';
-
+	description = 'A wire that carries electricity';
 	/**
 	 * @type {Item[]}
 	 */
@@ -39,7 +38,7 @@ export class Conveyor extends Machine {
 	 * @type {Item[]}
 	 */
 	outStore = [];
-	maxConcurrent = 2;
+	maxConcurrent = 1;
 	transferRate = 1;
 
 	constructor(factory, x, y) {
@@ -83,13 +82,9 @@ export class Conveyor extends Machine {
 		if (this.store.length) {
 			const stepSize = 1 / this.maxConcurrent;
 			for (let i = 0; i < this.store.length; i++) {
-				const pos = V2.make(0, -i * stepSize);
-				const center = V2.make(0.25, 0.25);
-				pos.theta += this.rotations * 90;
-
+				const pos = V2.make(0, 0);
 				// if (Math.random() < 0.002) console.log(pos);
 				V2.add(pos, [this.xpos, this.ypos], pos);
-				V2.add(pos, center, pos);
 				V2.copy(pos, this.store[i].optMovablePos.target);
 			}
 
@@ -128,8 +123,8 @@ export class Conveyor extends Machine {
 					sprites[item.location + item.name + '.svg'],
 					drawnPos.x,
 					drawnPos.y,
-					1 / 2,
-					1 / 2
+					1,
+					1
 				);
 			}
 		} catch (e) {}
@@ -205,10 +200,7 @@ export class Conveyor extends Machine {
 	}
 
 	async loop1() {
-		while (
-			this.inStore.length &&
-			this.outStore.length < this.maxConcurrent / 2
-		) {
+		while (this.inStore.length && this.store.length <= this.maxConcurrent) {
 			this.outStore.push(this.inStore.shift());
 		}
 	}
@@ -218,7 +210,7 @@ export class Conveyor extends Machine {
 	 * @param {Item} item
 	 */
 	pushItem(item) {
-		if (this.inStore.length < this.maxConcurrent / 2) {
+		if (this.store.length < this.maxConcurrent && hasTag(item, 'electricity')) {
 			this.inStore.push(item);
 			return true;
 		} else return false;
@@ -271,4 +263,4 @@ export class Conveyor extends Machine {
 }
 
 // @ts-ignore
-game.machines['Conveyor'] = Conveyor;
+game.machines['Wire'] = Wire;
